@@ -1,4 +1,7 @@
 *.py[co]
+user.*.sqlite
+test.py
+*~
 
 # Packages
 *.egg
