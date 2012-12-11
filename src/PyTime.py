@@ -14,7 +14,7 @@ import Gui.Mate
 
 class PyTime:
     def __init__(self):
-        self._store = Sqlite(os.path.join(os.path.expanduser("~"), '.PyTime', "user." + pwd.getpwuid(os.getuid())[0] + ".test.sqlite"))
+        self._store = Sqlite(os.path.join(os.path.expanduser("~"), '.PyTime', "user." + pwd.getpwuid(os.getuid())[0] + ".sqlite"))
         self._eventSource = Mate.Mate()
     
     def runGui(self):
