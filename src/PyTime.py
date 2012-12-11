@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 Created on Oct 28, 2012
 
@@ -8,6 +9,7 @@ from Store.Sqlite import Sqlite
 import time
 import os
 import pwd
+import Gui.Mate
 
 class PyTime:
     def __init__(self):
@@ -32,6 +34,8 @@ class PyTime:
         self._store.write(lTime, "unlock")
 
 if __name__ == '__main__':
-    pyTime = PyTime()
-    pyTime.run()
+    gui = Gui.Mate.Mate()
+    gui.run()
+#    pyTime = PyTime()
+#    pyTime.run()
     
