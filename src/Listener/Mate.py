@@ -39,11 +39,12 @@ s
         DBusGMainLoop(set_as_default=True)
         self._bus = dbus.SessionBus() 
     
-    def run(self):
+    def start(self):
         self.initLoop()
         self.connect()
-        self._loop = gobject.MainLoop()
-        self._loop.run()
+        
+    def stop(self):
+        pass
         
     def connect(self):
         self._bus.add_signal_receiver(self.signalHandler, dbus_interface="org.mate.SessionManager.Presence", member_keyword="StatusChanged")

@@ -4,7 +4,7 @@ class ListenerAbstract():
         self._listenersLock = []
         self._listenersUnlock = []
     
-    def run(self):
+    def start(self):
         pass
     
     def registerForLock(self, callback):

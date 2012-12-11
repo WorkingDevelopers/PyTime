@@ -5,6 +5,8 @@ Created on Nov 30, 2012
 '''
 import gtk
 from Gui import Abstract
+import Gui
+import inspect, os
 #from gi.repository import GObject
 
 class Mate(Abstract):
@@ -18,6 +20,7 @@ class Mate(Abstract):
         Constructor
         '''
         self._window = None
+        Gui.Abstract.__init__(self)
         
     def create(self):
         self._window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -34,14 +37,12 @@ class Mate(Abstract):
         #self._window.show()
         
     def onQuitClick(self,widget,data=None):
-        print "quit"
+        pass
         
     def onWindowDestory(self,widget,data=None):
-        print "detroyed"
         gtk.main_quit()
         
     def onWindowDelete(self,widget,data=None):
-        print "delete"
         return False
         
     def run(self):
@@ -53,7 +54,9 @@ class StatusIcon():
     
     def __init__(self,window):
         self.statusicon = gtk.StatusIcon()
-        self.statusicon.set_from_stock(gtk.STOCK_HOME) 
+        icon = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        icon = os.path.join(os.path.dirname(icon),'resources','icon22.png')
+        self.statusicon.set_from_file(icon)
         self.statusicon.connect("popup-menu", self.right_click_event)
 
     def right_click_event(self, icon, button, time):
