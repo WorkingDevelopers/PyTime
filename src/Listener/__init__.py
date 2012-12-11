@@ -1,3 +1,11 @@
+'''
+signal sender=:1.116 -> dest=(null destination) serial=21 path=/org/gnome/ScreenSaver; interface=org.gnome.ScreenSaver; member=ActiveChanged
+   boolean false
+signal sender=:1.0 -> dest=(null destination) serial=92 path=/org/gnome/SessionManager/Presence; interface=org.gnome.SessionManager.Presence; member=StatusChanged
+   uint32 0
+
+'''
+
 class ListenerAbstract():
     
     def __init__(self):

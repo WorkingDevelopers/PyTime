@@ -12,7 +12,7 @@ class Sqlite(object):
     classdocs
     '''
 
-    def __init__(self,dbfile):
+    def __init__(self, dbfile):
         '''
         Constructor
         '''
@@ -22,8 +22,8 @@ class Sqlite(object):
     def __del__(self):
         self.close()
         
-    def write(self,aTime,event):
-        logInsert = "INSERT INTO logonoff (time,event) VALUES ('"+time.strftime("%Y%m%dT%H%M%S",aTime)+"','"+event+"');"
+    def write(self, aTime, event):
+        logInsert = "INSERT INTO logonoff (time,event,timezone) VALUES ('" + time.strftime("%Y%m%dT%H%M%S", aTime) + "','" + event + "','" + str(time.timezone / 3600) + "');"
         cur = self.getDb().cursor()
         cur.execute(logInsert)
         self.getDb().commit()
@@ -33,14 +33,16 @@ class Sqlite(object):
             self.connect()
         return self._db
     
-    def createDB(self,db):
+    def createDB(self, db):
         with db:
             cur = db.cursor()    
             cur.execute("""
             CREATE TABLE logonoff(
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
                 "time" DATETIME NOT NULL,
-                "event" VARCHAR(50) NOT NULL)
+                "event" VARCHAR(50) NOT NULL,
+                "timezone" SMALLINT NOT NULL DEFAULT -1
+                )
             """)
     
     def connect(self):
