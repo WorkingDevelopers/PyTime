@@ -23,11 +23,17 @@ class PyTime:
     
     def startLogger(self):
         self._eventSource = Mate.Mate()
-        lTime = time.gmtime()
-        print "Start", time.strftime("%Y%m%dT%H%M%S+0000", lTime), "Uptime: ", self.uptime()
+        ltimesec = time.time()
+        lTime = time.gmtime(ltimesec)
+        uptime=self.uptime()
+        timeatup=time.gmtime(ltimesec-uptime)
+        print "Start", time.strftime("%Y%m%dT%H%M%S+0000", lTime), " timezone ",str(time.timezone/3600)
+        print "Startup Time", time.strftime("%Y%m%dT%H%M%S+0000", timeatup), "Uptime: ", str(timedelta(seconds=uptime))
         self._eventSource.registerForLock(self.callbackLock)
         self._eventSource.registerForUnlock(self.callbackUnlock)
+        self._store.write(timeatup, "timeup-started")
         self._store.write(lTime, "started")
+        
         self._eventSource.start()
         
     def stopLogger(self):
@@ -60,9 +66,7 @@ class PyTime:
         
     def uptime(self):
         with open('/proc/uptime', 'r') as f:
-            uptime_seconds = float(f.readline().split()[0])
-            uptime_string = str(timedelta(seconds=uptime_seconds))
-            return uptime_string
+            return float(f.readline().split()[0])
 
 if __name__ == '__main__':
     pyTime = PyTime()
