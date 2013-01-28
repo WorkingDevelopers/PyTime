@@ -1,3 +1,7 @@
+"""
+@author Christoph Graupner <ch.graupner@workingdeveloper.de>
+"""
+
 class Abstract(object):
     
     def __init__(self):
