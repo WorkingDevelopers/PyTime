@@ -62,7 +62,7 @@ class PyTimeController:
 
     def __init__(self):
         self._store = Sqlite(
-            os.path.join(os.path.expanduser("~"), '.PyTime', "test.user." + pwd.getpwuid(os.getuid())[0] + ".sqlite"))
+            os.path.join(os.path.expanduser("~"), '.PyTime', "user." + pwd.getpwuid(os.getuid())[0] + ".sqlite"))
         self._eventSource = Mate.Mate()
         self._listener = PyTimeController.Listener(self._store)
         EventManager.i().register(EventManager.EVT_SCREEN_LOCK, self._listener)

@@ -26,7 +26,6 @@ class Mate(ListenerAbstract):
         self._loop = None
         self._bus = None
         self._screenInterface = None
-        self._eventmanager = EventManager()
         '''signal sender=:1.39 -> dest=(null destination) serial=14 path=/org/mate/ScreenSaver; interface=org.mate.ScreenSaver; member=ActiveChanged
    boolean true
 
@@ -62,8 +61,8 @@ s
         #signal sender=:1.0 -> dest=(null destination) serial=66 path=/org/mate/SessionManager/Presence; interface=org.mate.SessionManager.Presence; member=StatusChanged uint32 3
     def signalHandler(self, status, **kwargs):
         if status == self.STATUS_AVAILABLE:
-            self._eventmanager.emitScreenUnlock(self)
+            EventManager().i().emitScreenUnlock(self)
 
         elif status == self.STATUS_IDLE:
-            self._eventmanager.emitScreenLock(self)
+            EventManager().i().emitScreenLock(self)
     
