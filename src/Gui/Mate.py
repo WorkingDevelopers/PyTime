@@ -12,11 +12,11 @@ import inspect, os
 #from gi.repository import GObject
 from Events import EventManager
 
+
 class Mate(Abstract):
     """
     classdocs
     """
-
 
     def __init__(self):
         """
@@ -51,8 +51,12 @@ class Mate(Abstract):
     def onWindowDelete(self, widget, data=None):
         return False
 
+    def askReason(self, title, predefined):
+        dlg = StatusInputDialog(title, predefined)
+        dlg.run()
+
     def run(self):
-        if self._window == None:
+        if self._window is None:
             self.create()
         gtk.main()
 
@@ -96,11 +100,14 @@ class StatusIcon():
 
     def logStart(self, widget):
         EventManager.i().emitAppRequestEvent(self,
-            {'event': 'started', 'request': 'log.start', 'reason': 'manual entry','time':time.gmtime()})
+                                             {'event': 'started', 'request': 'log.start', 'reason': 'manual entry',
+                                              'time': time.gmtime()})
 
     def logStop(self, widget):
-        EventManager.i().emitAppRequestEvent(self,
-            {'event': 'stopped', 'request': 'log.stop', 'reason': 'manual entry','time':time.gmtime()})
+        EventManager.i().emitScreenUnlock('test unlock')
+        # EventManager.i().emitAppRequestEvent(self,
+        #                                      {'event': 'stopped', 'request': 'log.stop', 'reason': 'manual entry',
+        #                                       'time': time.gmtime()})
 
     def onQuit(self, widget):
         gtk.main_quit()
@@ -112,9 +119,73 @@ class AboutDialog(object):
         self._dlg = gtk.AboutDialog()
         self._dlg.set_destroy_with_parent(True)
         self._dlg.set_name("WorkingDevelopers PyTime")
-        self._dlg.set_version("1.1")
+        self._dlg.set_version("1.2")
         self._dlg.set_authors(["Christoph Graupner"])
 
     def run(self):
         self._dlg.run()
         self._dlg.destroy()
+
+
+class StatusInputDialog(gtk.Dialog):
+    def __init__(self, title, predefined):
+        super(StatusInputDialog, self).__init__(buttons=('OK', 1, 'Cancel', 0))
+        self.set_title(title)
+        self.set_flags(gtk.DIALOG_DESTROY_WITH_PARENT)
+
+        self.set_size_request(250, 100)
+        self.set_position(gtk.WIN_POS_CENTER)
+        # self.connect("destroy", gtk.)
+
+        table = gtk.Table(2, 2, True)
+
+        info = gtk.Button("Information")
+        warn = gtk.Button("Warning")
+        ques = gtk.Button("Question")
+        erro = gtk.Button("Error")
+
+        info.connect("clicked", self.on_info)
+        warn.connect("clicked", self.on_warn)
+        ques.connect("clicked", self.on_ques)
+        erro.connect("clicked", self.on_erro)
+
+        table.attach(info, 0, 1, 0, 1)
+        table.attach(warn, 1, 2, 0, 1)
+        table.attach(ques, 0, 1, 1, 2)
+        table.attach(erro, 1, 2, 1, 2)
+        # self.action_area.pack_start(info, 1, 1, 0)
+        # self.add_button('info',info)
+
+        self.vbox.add(table)
+        self.show_all()
+
+    def on_info(self, widget):
+        md = gtk.MessageDialog(self,
+                               gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
+                               gtk.BUTTONS_CLOSE, "Download completed")
+        md.run()
+        md.destroy()
+
+
+    def on_erro(self, widget):
+        md = gtk.MessageDialog(self,
+                               gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
+                               gtk.BUTTONS_CLOSE, "Error loading file")
+        md.run()
+        md.destroy()
+
+
+    def on_ques(self, widget):
+        md = gtk.MessageDialog(self,
+                               gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION,
+                               gtk.BUTTONS_CLOSE, "Are you sure to quit?")
+        md.run()
+        md.destroy()
+
+
+    def on_warn(self, widget):
+        md = gtk.MessageDialog(self,
+                               gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING,
+                               gtk.BUTTONS_CLOSE, "Unallowed operation")
+        md.run()
+        md.destroy()

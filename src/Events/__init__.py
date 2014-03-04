@@ -42,6 +42,10 @@ class EventManager(object):
         else:
             raise Exception("No event " + event + " to register for.")
 
+    def emit(self,signal,sender):
+        for listener in self._listeners[signal]:
+            listener.onLock(sender)
+
     def emitScreenLock(self, sender):
         for listener in self._listeners[EventManager.EVT_SCREEN_LOCK]:
             listener.onLock(sender)

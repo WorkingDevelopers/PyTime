@@ -5,19 +5,24 @@ Created on Oct 28, 2012
 @author: Christoph Graupner <ch.graupner@workingdeveloper.de>
 """
 import argparse
+import atexit
 from Store.Sqlite import Sqlite
 import time
 import os
 import pwd
+import signal
+import sys
 from datetime import timedelta
 import Gui.Mate
 from Events import EventManager
 from Events.Listener import Mate, ListenerScreen, ListenerApplication, ListenerLog
 
+
 class PyTimeController:
     class Listener(ListenerScreen, ListenerApplication, ListenerLog):
-        def __init__(self, store):
+        def __init__(self, store, gui):
             self._store = store
+            self._gui = gui
 
         def onLock(self, sender=None):
             lTime = time.gmtime()
@@ -52,6 +57,7 @@ class PyTimeController:
 
         def onUnlock(self, sender=None):
             lTime = time.gmtime()
+            reason = self._gui.askReason("Reason for lock", ['Toilet', 'Lunch'])
             print "Unlocked", time.strftime("%Y%m%dT%H%M%S+0000", lTime)
             self._store.write(lTime, "unlock")
 
@@ -59,21 +65,24 @@ class PyTimeController:
             print message
             self._store.write(message['time'], message['event'], message['reason'])
 
-
     def __init__(self):
         self._store = Sqlite(
-            os.path.join(os.path.expanduser("~"), '.PyTime', "user." + pwd.getpwuid(os.getuid())[0] + ".sqlite"))
+            os.path.join(os.path.expanduser("~"), '.PyTime', "user_test." + pwd.getpwuid(os.getuid())[0] + ".sqlite"))
         self._eventSource = Mate.Mate()
-        self._listener = PyTimeController.Listener(self._store)
+        self._gui = Gui.Mate.Mate()
+        self._listener = PyTimeController.Listener(self._store, self._gui)
         EventManager.i().register(EventManager.EVT_SCREEN_LOCK, self._listener)
         EventManager.i().register(EventManager.EVT_SCREEN_UNLOCK, self._listener)
         EventManager.i().register(EventManager.EVT_APP_QUIT, self._listener)
         EventManager.i().register(EventManager.EVT_SCREEN_EXIT, self._listener)
         EventManager.i().register(EventManager.EVT_APP_REQUEST_LOG, self._listener)
         EventManager.i().register(EventManager.EVT_APP_START, self._listener)
+        atexit.register(self.atexit_handler)
+
+    def atexit_handler(self):
+        EventManager.i().emitAppQuit(EventManager.EVT_APP_QUIT, 'at_exit')
 
     def runGui(self):
-        self._gui = Gui.Mate.Mate()
         self._gui.run()
 
     def startLogger(self):
@@ -101,7 +110,7 @@ class PyTimeController:
     def parseOptions(self):
         parser = argparse.ArgumentParser(description='Setup the SHOP dev-base VM')
         parser.add_argument('-d', '--debug', type=bool, action="store_true",
-            help='Enable debug ')
+                            help='Enable debug ')
         group = parser.add_mutually_exclusive_group()
         group.add_argument("-v", "--verbose", action="store_true")
         group.add_argument("-q", "--quiet", action="store_true")
@@ -113,6 +122,7 @@ class PyTimeController:
     def uptime(cls):
         with open('/proc/uptime', 'r') as f:
             return float(f.readline().split()[0])
+
 
 if __name__ == '__main__':
     pyTime = PyTimeController()
